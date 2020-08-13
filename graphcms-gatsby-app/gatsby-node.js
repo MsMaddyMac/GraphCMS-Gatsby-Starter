@@ -1,7 +1,27 @@
-/**
- * Implement Gatsby's Node APIs in this file.
- *
- * See: https://www.gatsbyjs.org/docs/node-apis/
- */
+exports.createPages = async ({ graphql, actions: { createPage } }) => {
+  const {
+    data: {
+      graphCMS: { events },
+    },
+  } = await graphql(`
+    {
+      graphCMS {
+        events {
+          id
+          title
+          slug
+        }
+      }
+    }
+  `)
 
-// You can delete this file if you're not using it
+  events.forEach(({ id, slug }) =>
+    createPage({
+      path: `/events/${slug}`,
+      component: require.resolve(`./src/templates/EventPage.js`),
+      context: {
+        id,
+      },
+    })
+  )
+}
